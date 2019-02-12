@@ -1,16 +1,16 @@
-var http = require('http')
-var express = require('express')
-var routing = require('./requestRouting.js')
-var path = require('path');
+var bodyParser = require('body-parser'),
+    http = require('http'),
+    express = require('express')
 
+var port    = port = process.env.PORT || 3000,
+    app     = express(),
+    Server  = http.createServer(app)
 
-var PORT = 3000
-var app = express()
-app.use(routing)
-var publicPath = path.resolve(__dirname, 'client');
-app.use(express.static(publicPath));
-var Server = http.createServer(app)
-Server.listen(PORT, function(){
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: true}))
+app.use(express.static('./public'))
+
+Server.listen(port, function(){
   // Poner un mensaje en la consola
-  console.log("Servidor funcionando en el puerto " + PORT)
+  console.log("Servidor funcionando en el puerto " + port)
 });
