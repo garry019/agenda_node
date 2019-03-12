@@ -21,20 +21,35 @@
     </div>
     <script src="js/jquery.js"></script>
     <script>
+        console.log('Para crear un usuario debes ejecutar la funcion: crearUsuario("cedula","nombre","password","pais") ');
+        sessionStorage.clear();
         var nombreUsuario = $('#user')
         var pass = $('#pass')
         $('.loginButton').on('click', function(event) {
             if (nombreUsuario.val() != "" && pass.val() != "") {
-                $.get('/login',{user: nombreUsuario.val(), pass: pass.val()}, function(response) {
-                    // if (response == "Validado") {
-                    //     window.location.href = "http://localhost:3000/main.html"
-                    // }
-                    alert(response);
+                $.post('/login',{user: nombreUsuario.val(), pass: pass.val()}, function(response) {
+                    if (response.rpta1 == "Validado") {
+                        sessionStorage.setItem("user", response.rpta2);
+                        window.location.href = "http://localhost:3000/main.html"
+                    }else{
+                      alert("Error de validación compruebe sus datos")
+                    }
                 })
             } else {
                 alert("Complete todos los campos")
             }
         })
+
+        function crearUsuario(cedula,nombre,pass,pais){
+          $.post('/nuevoUsuario',{cedula:cedula, nombre:nombre ,pass:pass, pais:pais}, function(response) {
+              if (response == "Creado") {
+                console.log('El usuario ha sido creado');
+              }else{
+                alert("Error en la creación, compruebe sus datos")
+              }
+          })
+        }
+
     </script>
   </body>
 </html>

@@ -2,31 +2,68 @@ const MongoClient = require('mongodb')
 const Router = require('express').Router()
 var url = 'mongodb://localhost:27017'
 
-Router.get('/login', function(req, res){
+Router.post('/login', function(req, res){
   MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
     if (err)console.log('Conexion establecida con la base de datos');
-
     var db = client.db('mibase');
-    db.collection('usuarios').find().toArray((error, documents)=>{
+    db.collection('usuarios').find({cedula:req.body.user, pass:req.body.pass}).toArray((error, documents)=>{
       if(error)console.log(error)
-      console.log(documents)
-      res.json(documents)
+      if(documents[0].cedula == req.body.user && documents[0].pass == req.body.pass){
+        //console.log(documents);
+        let respuesta = {
+          rpta1: 'Validado',
+          rpta2: documents[0]._id
+        }
+        res.json(respuesta)
+      }
+      //console.log(req.body.user + ' ' + req.body.pass);
     });
     client.close();
   });
 })
 
+Router.post('/all', function(req, res){
+  MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
+    if (err)console.log('Conexion establecida con la base de datos');
+    var db = client.db('mibase');
+    db.collection('eventos').find({userId:req.body.user}).toArray((error, documents)=>{
+      if(error)console.log(error)
+      //console.log(documents.length);
+      res.json(documents)
+      //console.log(req.body.user + ' ' + req.body.pass);
+    });
+    client.close();
+  });
+})
 
-Router.get('/:id', function(req, res){
-
+Router.post('/nuevoUsuario', function(req, res){
+  MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
+    if (err)console.log('Conexion establecida con la base de datos');
+    var db = client.db('mibase');
+    db.collection('usuarios').insertMany([{cedula:req.body.cedula, nombre:req.body.nombre, pass:req.body.pass, pais:req.body.pais}]);
+    res.json('Creado');
+    client.close();
+  });
 })
 
 Router.post('/new', function(req, res){
-
+  MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
+    if (err)console.log('Conexion establecida con la base de datos');
+    var db = client.db('mibase');
+    db.collection('eventos').insertMany([{title:req.body.title, start:req.body.start, end:req.body.end, registro:req.body.registro, userId: req.body.userId}]);
+    res.json(req.body);
+    client.close();
+  });
 })
 
-Router.post('/delete/:id', function(req, res){
-
+Router.post('/delete', function(req, res){
+  MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
+    if (err)console.log('Conexion establecida con la base de datos');
+    var db = client.db('mibase');
+    db.collection('eventos').deleteMany([{_id:req.body.id}]);
+    res.json(req.body.id);
+    client.close();
+  });
 })
 
 module.exports = Router
