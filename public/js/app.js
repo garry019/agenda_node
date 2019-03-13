@@ -19,7 +19,9 @@ class EventManager {
   eliminarEvento(evento) {
     let eventId = evento._id
     $.post('/delete', {id: eventId}, (response) => {
-      console.log(response);
+      if(response){
+        console.log(response);
+      }
     })
   }
 
@@ -45,7 +47,6 @@ class EventManager {
           title: title,
           start: start,
           end: end,
-          registro: new Date(),
           userId: sessionStorage.getItem("user")
         }
         $.post(url, ev, (response) => {

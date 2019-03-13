@@ -50,7 +50,7 @@ Router.post('/new', function(req, res){
   MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
     if (err)console.log('Conexion establecida con la base de datos');
     var db = client.db('mibase');
-    db.collection('eventos').insertMany([{title:req.body.title, start:req.body.start, end:req.body.end, registro:req.body.registro, userId: req.body.userId}]);
+    db.collection('eventos').insertMany([{id:"",title:req.body.title, start:req.body.start, end:req.body.end, userId: req.body.userId}]);
     res.json(req.body);
     client.close();
   });
@@ -60,11 +60,11 @@ Router.post('/delete', function(req, res){
   MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
     if (err)console.log('Conexion establecida con la base de datos');
     var db = client.db('mibase');
-    db.collection('eventos').deleteMany([{_id:req.body.id}]);
+    let eventoId = req.body.id;
+    db.collection('eventos').deleteOne({});
     res.json(req.body.id);
     client.close();
   });
 })
-
 
 module.exports = Router
