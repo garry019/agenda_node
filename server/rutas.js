@@ -46,11 +46,23 @@ Router.post('/nuevoUsuario', function(req, res){
   });
 })
 
+function sec(){
+  MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
+    if (err)console.log('Conexion establecida con la base de datos');
+    var db = client.db('mibase');
+    db.collection('counters').findOneAndUpdate({_id:"eventoid"},{$inc:{seq:1}});
+
+    client.close();
+  });
+  return sec.seq;
+}
+
 Router.post('/new', function(req, res){
   MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
     if (err)console.log('Conexion establecida con la base de datos');
     var db = client.db('mibase');
-    db.collection('eventos').insertMany([{id:"",title:req.body.title, start:req.body.start, end:req.body.end, userId: req.body.userId}]);
+    var sec = db.collection('counters').findOne({_id:"eventoid"})
+    db.collection('eventos').insertMany([{id:sec.seq,title:req.body.title, start:req.body.start, end:req.body.end, userId: req.body.userId}]);
     res.json(req.body);
     client.close();
   });
