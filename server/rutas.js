@@ -50,9 +50,10 @@ Router.post('/new', function(req, res){
   MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
     if (err)console.log('Conexion establecida con la base de datos');
     var db = client.db('mibase');
-    var inc = db.collection('counters').findOneAndUpdate({_id:"eventoid"},{$inc:{seq:1}});
+    var inc = db.collection('counters').findOneAndUpdate({_id:"eventoid"},{$inc:{seq:1}},{new: true});
+    //db.collection('counters').findOneAndUpdate({_id:"eventoid"},{$inc:{seq:1}});
     db.collection('eventos').insertMany([{id:"",title:req.body.title, start:req.body.start, end:req.body.end, userId: req.body.userId}]);
-    console.log(inc.seq);
+    console.log(inc);
     res.json(req.body);
     client.close();
   });
