@@ -9,10 +9,11 @@ class EventManager {
   }
 
   obtenerDataInicial(userId) {
+    console.log('Obteniendo data del usuario: '+userId);
     let url = this.urlBase + "/all"
     $.post(url, {user: userId}, (response) => {
       this.inicializarCalendario(response)
-      //console.log(response);
+      //console.log(response)
     })
   }
 
@@ -123,6 +124,35 @@ class EventManager {
         }
       })
     }
-  }
 
-  const Manager = new EventManager()
+    actualizarEvento(evento) {
+        let id = evento._id,
+            start = moment(evento.start).format('YYYY-MM-DD HH:mm:ss'),
+            end = moment(evento.end).format('YYYY-MM-DD HH:mm:ss'),
+            form_data = new FormData(),
+            start_date,
+            end_date,
+            start_hour,
+            end_hour
+
+        start_date = start.substr(0,10)
+        end_date = end.substr(0,10)
+        start_hour = start.substr(11,8)
+        end_hour = end.substr(11,8)
+
+        let ev = {
+                    id: id,
+                    start: start_date,
+                    start_hour:start_hour,
+                    end: end_date,
+                    end_hour: end_hour ,
+                }
+
+        $.post('/update', ev, function(response) {
+            console.log(response);
+        });
+        console.log('Actualizando')
+    }
+}
+
+const Manager = new EventManager()

@@ -21,7 +21,6 @@
     </div>
     <script src="js/jquery.js"></script>
     <script>
-        console.log('Para crear un usuario debes ejecutar la funcion: crearUsuario("cedula","nombre","password","pais") ');
         sessionStorage.clear();
         var nombreUsuario = $('#user')
         var pass = $('#pass')
@@ -39,17 +38,6 @@
                 alert("Complete todos los campos")
             }
         })
-
-        function crearUsuario(cedula,nombre,pass,pais){
-          $.post('/nuevoUsuario',{cedula:cedula, nombre:nombre ,pass:pass, pais:pais}, function(response) {
-              if (response == "Creado") {
-                console.log('El usuario ha sido creado');
-              }else{
-                alert("Error en la creación, compruebe sus datos")
-              }
-          })
-        }
-
     </script>
   </body>
 </html>

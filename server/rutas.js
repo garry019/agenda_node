@@ -1,84 +1,82 @@
-const MongoClient = require('mongodb')
 const Router = require('express').Router()
-var url = 'mongodb://localhost:27017'
+const Eventos = require('./modelos/eventos.model')
+const Users = require('./modelos/user.model')
+const mongoose = require('mongoose')
 
 Router.post('/login', function(req, res){
-  MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
-    if (err)console.log('Conexion establecida con la base de datos');
-    var db = client.db('mibase');
-    db.collection('usuarios').find({cedula:req.body.user, pass:req.body.pass}).toArray((error, documents)=>{
-      if(error)console.log(error)
-      if(documents[0].cedula == req.body.user && documents[0].pass == req.body.pass){
-        //console.log(documents);
-        let respuesta = {
+	Users.findOne({name:req.body.user,pass:req.body.pass}, function(err, doc){
+		if(err){
+    	res.status(500)
+    	res.json(err)
+    }
+    if(doc){
+        res.send({
           rpta1: 'Validado',
-          rpta2: documents[0]._id
-        }
-        res.json(respuesta)
-      }
-      //console.log(req.body.user + ' ' + req.body.pass);
-    });
-    client.close();
+          rpta2: doc._id
+        })
+    }else{
+      res.send({
+        rpta1: 'cancelar'
+      })
+    }
   });
 })
 
 Router.post('/all', function(req, res){
-  MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
-    if (err)console.log('Conexion establecida con la base de datos');
-    var db = client.db('mibase');
-    db.collection('eventos').find({userId:req.body.user}).toArray((error, documents)=>{
-      if(error)console.log(error)
-      //console.log(documents.length);
-      res.json(documents)
-      //console.log(req.body.user + ' ' + req.body.pass);
-    });
-    client.close();
+  Eventos.find({userId:req.body.user}, function(err, doc){
+		if(err){
+    	res.status(500)
+    	res.json(err)
+    }
+    res.json(doc)
   });
 })
-
-Router.post('/nuevoUsuario', function(req, res){
-  MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
-    if (err)console.log('Conexion establecida con la base de datos');
-    var db = client.db('mibase');
-    db.collection('usuarios').insertMany([{cedula:req.body.cedula, nombre:req.body.nombre, pass:req.body.pass, pais:req.body.pais}]);
-    res.json('Creado');
-    client.close();
-  });
-})
-
-function incremento(){
-  MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
-    if (err)console.log('Conexion establecida con la base de datos');
-    var db = client.db('mibase');
-
-    client.close()
-  });
-
-}
 
 Router.post('/new', function(req, res){
-  MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
-    if (err)console.log('Conexion establecida con la base de datos');
-    var db = client.db('mibase');
-    db.collection('counters').findOneAndUpdate({_id:"eventoid"},{$inc:{seq:1}},{new: true}).then( (data)=>{
-      var incremento = data.value.seq;
-      db.collection('eventos').insertMany([{ id: "", title: req.body.title, start: req.body.start, end: req.body.end, userId: req.body.userId }], function (err, data){
-        console.log(incremento);
-      })
-    });
-    client.close();
-  });
+  let event = new Eventos({
+    _id : new mongoose.Types.ObjectId(),
+    title: req.body.title,
+    start: req.body.start,
+    end: req.body.end,
+    userId: mongoose.Types.ObjectId(req.body.userId)
+  })
+  event.save(function(err,response){
+    if(err){
+        res.json(`Hubo un error ${err}`)
+        console.log(`Hubo un error ${err}`)
+    }else{
+        res.status(200)
+        res.json('Registro exitoso')
+        //console.log(`Registro exitoso ${response}`)
+    }
+  })
 })
 
 Router.post('/delete', function(req, res){
-  MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
-    if (err)console.log('Conexion establecida con la base de datos');
-    var db = client.db('mibase');
-    let eventoId = req.body.id;
-    db.collection('eventos').deleteOne({});
-    res.json(req.body.id);
-    client.close();
+  Eventos.deleteOne({_id:mongoose.Types.ObjectId(req.body.id)}, function(err, doc){
+		if(err){
+    	res.status(500)
+    	res.json(err)
+    }
+    res.send('Se ha borrado el evento ' + doc)
   });
+  //console.log(req.body.id);
+})
+
+Router.post('/update', function(req, res){
+  eventId = mongoose.Types.ObjectId(req.body.id)
+  let evento = new Eventos({
+                start:req.body.start,
+                end:req.body.end
+              });
+  Eventos.updateOne({_id:eventId},evento,function(error){
+  	if(error){
+  		res.status(500)
+  		res.json(error)
+  	}
+    res.send("Evento Actualizado")
+  })
+  //console.log(req.body.start+' '+req.body.end);
 })
 
 module.exports = Router

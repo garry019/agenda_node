@@ -55,10 +55,11 @@ body {
 }
 
 .calendarContainer {
-  width: 97%;
+  width: 60%;
   height: 100%;
   margin: 8px;
   color: #FFFFFF;
+  margin: 0 auto;
 }
 
 .formContainer {
