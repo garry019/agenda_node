@@ -58,9 +58,8 @@ Router.post('/delete', function(req, res){
     	res.status(500)
     	res.json(err)
     }
-    res.send('Se ha borrado el evento ' + doc)
+    //res.send('Se ha borrado el evento ' + doc)
   });
-  //console.log(req.body.id);
 })
 
 Router.post('/update', function(req, res){

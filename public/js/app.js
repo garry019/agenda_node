@@ -21,7 +21,7 @@ class EventManager {
     let eventId = evento._id
     $.post('/delete', {id: eventId}, (response) => {
       if(response){
-        console.log(response);
+        //console.log(response);
       }
     })
   }
